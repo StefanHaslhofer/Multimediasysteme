@@ -1,9 +1,6 @@
 package at.jku.tk.mms.voice.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 import javax.sound.sampled.*;
 
@@ -90,6 +87,7 @@ public class VoiceMemoImpl implements Runnable {
         ByteArrayInputStream stream = new ByteArrayInputStream(nextToPlay.getPcmAudio());
 
         try {
+
             AudioInputStream audioInputStream =new AudioInputStream(stream, this.audioFormat, nextToPlay.getPcmAudio().length / this.audioFormat.getFrameSize());
 
             final DataLine.Info info = new DataLine.Info(SourceDataLine.class, this.audioFormat);
@@ -141,7 +139,7 @@ public class VoiceMemoImpl implements Runnable {
             targetLine.stop();
             targetLine.close();
 
-            r.setPcmAudio(buf);
+            r.setPcmAudio(baOut.toByteArray());
 
             setLastRecording(r);
         } catch (LineUnavailableException ex) {
