@@ -90,26 +90,27 @@ public class VoiceMemoImpl implements Runnable {
         ByteArrayInputStream stream = new ByteArrayInputStream(nextToPlay.getPcmAudio());
 
         try {
-            final DataLine.Info info = new DataLine.Info(SourceDataLine.class, this.audioFormat);
-            final SourceDataLine line = (SourceDataLine) AudioSystem.getLine(info);
+            AudioInputStream audioInputStream =new AudioInputStream(stream, this.audioFormat, nextToPlay.getPcmAudio().length / this.audioFormat.getFrameSize());
 
-            line.open();
-            line.start();
+            final DataLine.Info info = new DataLine.Info(SourceDataLine.class, this.audioFormat);
+            final SourceDataLine sourceLine = (SourceDataLine) AudioSystem.getLine(info);
+
+            sourceLine.open();
+            sourceLine.start();
 
             int readBytes;
             byte[] buf = new byte[1024];
             while (playing) {
-                readBytes = stream.read(buf, 0, buf.length);
+                readBytes = audioInputStream.read(buf, 0, buf.length);
                 if (readBytes == -1) break;
-                line.write(buf, 0, buf.length);
-                System.out.println(readBytes);
+                sourceLine.write(buf, 0, buf.length);
             }
 
-            line.flush();
-            line.drain();
-            line.stop();
-            line.close();
-        } catch (LineUnavailableException ex) {
+            sourceLine.flush();
+            sourceLine.drain();
+            sourceLine.stop();
+            sourceLine.close();
+        } catch (LineUnavailableException | IOException ex) {
             ex.printStackTrace();
         }
 
@@ -121,24 +122,24 @@ public class VoiceMemoImpl implements Runnable {
 
         try {
             final DataLine.Info info = new DataLine.Info(TargetDataLine.class, this.audioFormat);
-            final TargetDataLine line = (TargetDataLine) AudioSystem.getLine(info);
+            final TargetDataLine targetLine = (TargetDataLine) AudioSystem.getLine(info);
             final ByteArrayOutputStream baOut = new ByteArrayOutputStream();
 
-            line.open();
-            line.start();
+            targetLine.open();
+            targetLine.start();
 
             int readBytes;
             byte[] buf = new byte[64];
             while (recording) {
-                readBytes = line.read(buf, 0, buf.length);
+                readBytes = targetLine.read(buf, 0, buf.length);
                 baOut.write(buf, 0, readBytes);
                 if (readBytes == -1) break;
             }
 
-            line.flush();
-            line.drain();
-            line.stop();
-            line.close();
+            targetLine.flush();
+            targetLine.drain();
+            targetLine.stop();
+            targetLine.close();
 
             r.setPcmAudio(buf);
 
