@@ -100,7 +100,10 @@ public class VoiceMemoImpl implements Runnable {
             byte[] buf = new byte[1024];
             while (playing) {
                 readBytes = audioInputStream.read(buf, 0, buf.length);
-                if (readBytes == -1) break;
+                if (readBytes == -1) {
+                    playing = false;
+                    break;
+                }
                 sourceLine.write(buf, 0, buf.length);
             }
 
