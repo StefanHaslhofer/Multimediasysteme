@@ -74,9 +74,15 @@
     });
         
 
-    document.querySelector('#controls .play').onclick = console.log("asd");
-    document.querySelector('#controls .pause').onclick = motionPath.pause();
-    document.querySelector('#controls .restart').onclick = motionPath.restart();
+    document.querySelector('#controls .play').onclick = function () {
+        motionPath.play();
+    }
+    document.querySelector('#controls .pause').onclick = function () {
+        motionPath.pause();
+    }
+    document.querySelector('#controls .restart').onclick = function () {
+        motionPath.restart();
+    }
 
 
     let lineDrawing = anime({
